@@ -1,0 +1,143 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Solar Agarbatti Dryer – Live Digital Twin</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f3f6f4;--fg:#15211b;--card:#fff;--mut:#5a6a61;--ac:#1c7a4b;--bd:#d3dcd6}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1411;--fg:#e5efe9;--card:#17201b;--mut:#94a89c;--ac:#4cc38a;--bd:#2a3930}}
+:root[data-theme="dark"]{--bg:#0e1411;--fg:#e5efe9;--card:#17201b;--mut:#94a89c;--ac:#4cc38a;--bd:#2a3930}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:12px}
+h1{font-size:18px;margin:4px 0 2px}p.s{margin:0 0 10px;color:var(--mut)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px;margin-bottom:10px}
+.g{display:grid;gap:10px;grid-template-columns:1fr}@media(min-width:900px){.g{grid-template-columns:1.6fr 1fr}}
+canvas{width:100%;height:auto;display:block;border-radius:8px;background:#0d1a14}
+.k{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:8px}
+.k div{background:var(--bg);border-radius:8px;padding:6px 8px}.k b{display:block;font-size:16px}.k span{color:var(--mut);font-size:11px}
+label{display:grid;grid-template-columns:105px 1fr 38px;align-items:center;gap:6px;font-size:12px}
+label.ck{display:inline-flex;gap:4px}
+input[type=range]{width:100%;accent-color:var(--ac)}
+button,select{font:inherit;padding:6px 10px;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--fg)}
+button.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+.lg{columns:2;font-size:12px;margin:6px 0 0;padding-left:20px}@media(min-width:700px){.lg{columns:3}}
+details{font-size:12px;color:var(--mut)}
+</style></head><body><main>
+<h1>☀️ Solar Agarbatti Dryer — live digital twin</h1>
+<p class="s">Lumped physics model. Watch heat build up, then cut power and see how long the chamber holds heat.</p>
+<div class="g">
+<div><div class="card"><canvas id="cv" width="900" height="430"></canvas></div>
+<div class="card"><canvas id="ch" width="900" height="200"></canvas>
+<div style="font-size:11px;color:var(--mut)">Red: air °C · Orange: product °C · Blue: moisture % (wet basis) · x-axis: hours</div></div></div>
+<div>
+<div class="card" id="ctl" style="display:grid;gap:5px"></div>
+<div class="card" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+<select id="spd"><option value="60">×60</option><option value="300" selected>×300</option><option value="1200">×1200</option></select>
+<button id="cutb">⏻ Cut power</button><button id="rs">↺ Reset</button>
+<label class="ck"><input type="checkbox" id="auto" checked>Day curve</label>
+<label class="ck"><input type="checkbox" id="ac" checked>Auto-close louvers</label>
+<button class="p" id="tst">Heat-retention test</button></div>
+<div class="card" id="res" style="font-size:12px">Press <b>Heat-retention test</b>: warms the chamber 4 h, cuts power, and times how long the air stays ≥ 40 °C, with and without PCM. Press Reset after changing PCM kg.</div>
+</div></div>
+<div class="card k" id="kp"></div>
+<div class="card"><b>Parts</b><ol class="lg">
+<li>Intake louver module (servo)</li><li>Intake PWM fan</li><li>Baffle / diffuser duct</li><li>Heater coil (250 W DC)</li><li>Perforated trays T1–T5</li><li>PCM heat-battery panel</li><li>Insulated shell (PIR / mineral wool)</li><li>Exhaust PWM fan</li><li>Exhaust louver module (servo)</li><li>Recirculation damper (RH-controlled)</li><li>T/RH sensor node</li><li>Solar PV panel</li><li>Battery + MPPT controller</li><li>Double-glazed gasketed door</li></ol></div>
+<details class="card"><summary>Model assumptions (placeholders: replace with measured or SimScale values)</summary>
+PV 18% efficient · battery 480 Wh · heater 250 W · 1.2 kg dry sticks, start 0.6 kg/kg · drying constant and equilibrium moisture are placeholders (calibrate by weighing) · batch "done" at 10% wet basis · PCM melts at 46 °C, 200 kJ/kg, 40 W/K coupling · wall thermal mass 10 kJ/K · door/louver thermal bridges 1.2 W/K · insulation k = 0.04 W/mK · louver loss K = 1.5 + 40·sin²(angle) is a stand-in until CFD gives a real ΔP · fan free delivery 108 m³/h · lower setpoint dries slower but is gentler on volatile fragrance (confirm with your own tests).</details>
+</main>
+<script>
+const $=i=>document.getElementById(i);
+const S=[['G','Peak sun W/m²',0,1000,800,50],['cl','Cloud cover %',0,100,0,5],['Ta','Ambient °C',15,42,32,1],['RH','Ambient RH %',20,95,65,5],['pv','PV area m²',.3,2,1,.1],['ang','Louver angle °',0,75,30,5],['pwm','Fan PWM %',20,100,70,5],['set','Setpoint °C',35,58,50,1],['ins','Insulation mm',0,100,50,10],['pcm','PCM kg',0,10,4,1],['rec','Recirc. %',0,70,30,10]];
+$('ctl').innerHTML=S.map(([i,n,a,b,v,st])=>`<label>${n}<input id="${i}" type="range" min="${a}" max="${b}" step="${st}" value="${v}"><span id="${i}v"></span></label>`).join('');
+const P={};function rd(){S.forEach(([i])=>{P[i]=+$(i).value;$(i+'v').textContent=$(i).value});P.auto=$('auto').checked;P.ac=$('ac').checked}
+const BAT=480,PH=250,MD=1.2,X0=.6,TM=46,LAT=2e5,CPP=2e3,CA=400,CPR=6500,CW=1e4,RHO=1.12,CP=1005,MA=.25,AREA=1.9,DONE=10;
+const Ps=T=>610.94*Math.exp(17.625*T/(T+243.04)),PA=101325;
+const hr=(T,r)=>{const p=r*Ps(T);return .622*p/(PA-p)};
+const rhOf=(T,w)=>Math.min(1,w*PA/(.622+w)/Ps(T));
+const pT=(h,m)=>h<0?TM+h/(m*CPP):h>m*LAT?TM+(h-m*LAT)/(m*CPP):TM;
+const mcOf=s=>100*s.X/(1+s.X);
+function init(p){p=p||P;return{t:8*3600,Ta:p.Ta,Tp:p.Ta,Tw:p.Ta,h:p.pcm*CPP*(p.Ta-TM),X:X0,w:hr(p.Ta,p.RH/100),soc:.8*BAT,E:0,Q:0,G:0,Ppv:0,Ph:0,Pf:0,duty:0,K:0,mf:0,Tpc:p.Ta,rh:p.RH/100,ang:p.ang,r:0}}
+function step(s,p,c){
+ const hour=(s.t/3600)%24;
+ const G=(p.auto?p.G*Math.max(0,Math.sin(Math.PI*(hour-6)/12)):p.G)*(1-p.cl/100);
+ const Ppv=G*p.pv*.18,a=c.closed?85:p.ang,sn=Math.sin(a*Math.PI/180);
+ const K=1.5+40*sn*sn,pw=c.on?p.pwm/100:0;
+ const Q=c.on&&!c.closed?.03*pw/Math.sqrt(1+.12*K):0,lk=c.closed?4e-4:0;
+ const rh=rhOf(s.Ta,s.w),r=rh<.6?p.rec/100:0,wa=hr(p.Ta,p.RH/100);
+ const duty=c.on?Math.max(0,Math.min(1,(p.set-s.Ta)*.4)):0;
+ let Ph=duty*PH;const Pf=c.on?2*(2+8*pw*pw*pw):0;
+ if(s.soc<=.05*BAT)Ph=Math.max(0,Math.min(Ph,Ppv-Pf-3));
+ const net=Ppv-Ph-Pf-3;
+ s.soc=Math.min(BAT,Math.max(0,s.soc+(net>0?net*.92:net/.95)/3600));
+ s.E+=(Ph+Pf)/3600/1000;
+ const Uo=AREA/(p.ins/1000/.04+.15)+1.2,UAp=20+800*Q,UAw=15,UAc=p.pcm>0?40:0;
+ const Tpc=p.pcm>0?pT(s.h,p.pcm):s.Ta;
+ const Xe=.05+.1*rh,k=6e-5*Math.exp(.04*(s.Tp-35))*(.45+.55*Math.min(1,Q/.02));
+ const ev=MD*k*(s.X-Xe),mv=RHO*(Q*(1-r)+lk);
+ const dTa=(Ph+UAp*(s.Tp-s.Ta)+UAw*(s.Tw-s.Ta)+UAc*(Tpc-s.Ta)-mv*CP*(s.Ta-p.Ta))/CA;
+ const dTp=(UAp*(s.Ta-s.Tp)-ev*2.4e6)/CPR;
+ const dTw=(UAw*(s.Ta-s.Tw)-Uo*(s.Tw-p.Ta))/CW;
+ const dw=(ev-mv*(s.w-wa))/MA;
+ if(p.pcm>0)s.h+=UAc*(s.Ta-Tpc);
+ s.Ta+=dTa;s.Tp+=dTp;s.Tw+=dTw;s.w=Math.max(1e-4,s.w+dw);s.X-=k*(s.X-Xe);
+ s.t++;s.Q=Q;s.G=G;s.Ppv=Ppv;s.Ph=Ph;s.Pf=Pf;s.duty=duty;s.K=K;s.rh=rh;s.Tpc=Tpc;s.ang=a;s.r=r;
+ s.mf=p.pcm>0?Math.max(0,Math.min(1,s.h/(p.pcm*LAT))):0;
+}
+function ret(m){const p=Object.assign({},P,{auto:false,G:700,cl:0,pcm:m}),s=init(p);s.X=.3;
+ for(let i=0;i<14400;i++)step(s,p,{on:true,closed:false});
+ const pk=s.Ta,c={on:false,closed:P.ac};let n=0;
+ for(let i=0;i<144000&&s.Ta>=40;i++){step(s,p,c);n++}
+ return[pk,n/3600]}
+$('tst').onclick=()=>{rd();const a=ret(0),b=ret(P.pcm);$('res').innerHTML=`<b>After power cut, air stays ≥ 40 °C for:</b><br>No PCM: <b>${a[1].toFixed(1)} h</b> (peak ${a[0].toFixed(0)} °C)<br>${P.pcm} kg PCM: <b>${b[1].toFixed(1)} h</b> (peak ${b[0].toFixed(0)} °C)<br><i>Model estimate. Verify with a logged cool-down test on the prototype.</i>`};
+const cv=$('cv'),c=cv.getContext('2d'),ch=$('ch').getContext('2d');
+const col=T=>`hsl(${Math.max(0,Math.min(240,240-(T-15)/45*240))},80%,52%)`;
+const pts=Array.from({length:70},()=>({x:205+Math.random()*490,y:190+Math.random()*120,ph:Math.random()*6}));
+let fa=0;
+function num(n,x,y){c.fillStyle='#ffd166';c.beginPath();c.arc(x,y,9,0,7);c.fill();c.fillStyle='#111';c.font='bold 11px sans-serif';c.textAlign='center';c.fillText(n,x,y+4);c.textAlign='left'}
+function lv(x,y0,n){c.strokeStyle='#cfd8d2';c.lineWidth=3;const a=s.ang*Math.PI/180;for(let k=0;k<n;k++){const cy=y0+(k+.5)*(120/n);c.beginPath();c.moveTo(x-16*Math.cos(a),cy-16*Math.sin(a));c.lineTo(x+16*Math.cos(a),cy+16*Math.sin(a));c.stroke()}c.lineWidth=1;c.strokeStyle='#6d7f74';c.strokeRect(x-22,y0,44,120)}
+function fan(x,y){c.strokeStyle='#8a9';c.beginPath();c.arc(x,y,22,0,7);c.stroke();for(let k=0;k<4;k++){const a=fa+k*Math.PI/2;c.beginPath();c.moveTo(x,y);c.lineTo(x+20*Math.cos(a),y+20*Math.sin(a));c.stroke()}}
+function draw(){
+ c.clearRect(0,0,900,430);c.textAlign='left';
+ c.fillStyle=`rgba(255,196,40,${.3+s.G/1200})`;c.beginPath();c.arc(70,55,22+s.G/70,0,7);c.fill();
+ c.save();c.translate(450,58);c.rotate(-.16);c.fillStyle='#20449a';c.fillRect(-200,-8,400,16);c.strokeStyle='#8fb0ff';c.strokeRect(-200,-8,400,16);c.restore();
+ c.fillStyle='#cfe';c.font='12px sans-serif';c.fillText(`PV ${s.Ppv.toFixed(0)} W`,560,32);num(12,650,62);
+ c.fillStyle=col(s.Ta);c.globalAlpha=.22;c.fillRect(250,110,400,280);c.globalAlpha=1;
+ c.strokeStyle='#9fb3a7';c.lineWidth=2+P.ins/7;c.strokeRect(250,110,400,280);c.lineWidth=1;num(7,250,110);
+ c.setLineDash([6,5]);c.strokeStyle=`rgba(120,200,255,${s.r?.9:.25})`;c.lineWidth=1+P.rec/12;c.beginPath();c.moveTo(675,150);c.lineTo(675,96);c.lineTo(225,96);c.lineTo(225,185);c.stroke();c.setLineDash([]);c.lineWidth=1;num(10,450,96);
+ lv(225,190,6);lv(675,150,6);num(1,225,180);num(9,675,140);
+ fa+=s.Q*40;fan(262,250);fan(638,210);num(2,262,222);num(8,638,182);
+ c.setLineDash([3,3]);c.strokeStyle='#9ab';c.beginPath();c.moveTo(292,150);c.lineTo(292,350);c.stroke();c.setLineDash([]);num(3,292,140);
+ c.strokeStyle=`rgb(255,${Math.round(150-110*s.duty)},30)`;c.shadowColor='#f70';c.shadowBlur=18*s.duty;c.lineWidth=3;c.beginPath();
+ for(let x=320;x<=600;x+=4){const y=130+Math.sin(x/5)*5;x==320?c.moveTo(x,y):c.lineTo(x,y)}c.stroke();c.shadowBlur=0;c.lineWidth=1;num(4,310,128);
+ for(let i=0;i<5;i++){const y=178+i*38;c.strokeStyle=col(s.Tp);c.lineWidth=5;c.beginPath();c.moveTo(315,y);c.lineTo(610,y);c.stroke();c.fillStyle='#fff';c.font='10px sans-serif';c.fillText('T'+(i+1),596,y-6)}
+ c.lineWidth=1;num(5,330,166);
+ const m=s.mf;c.fillStyle=P.pcm>0?`rgb(${74+181*m|0},${163-9*m|0},${255-195*m|0})`:'#333';c.fillRect(262,372,376,14);num(6,270,366);
+ c.fillStyle='#ddd';c.fillRect(556,240,14,22);num(11,563,232);
+ c.fillStyle='#cde';c.font='11px sans-serif';c.fillText('14 · front door (double glazed)',330,405);
+ c.strokeStyle='#8fa';c.strokeRect(20,340,150,46);c.fillStyle='#2fbf71';c.fillRect(22,342,146*s.soc/BAT,42);c.fillStyle='#fff';c.fillText(`Battery ${(100*s.soc/BAT).toFixed(0)}%`,50,368);num(13,30,336);
+ for(const p of pts){p.x+=s.Q*150;if(p.x>700){p.x=205;p.y=190+Math.random()*120}
+  const y=p.y-(p.x-205)/490*40+Math.sin(p.x/25+p.ph)*6,f=Math.max(0,Math.min(1,(p.x-290)/160));
+  c.fillStyle=col(P.Ta+(s.Ta-P.Ta)*f);c.fillRect(p.x,y,3,3)}
+}
+function chart(){const w=900,h=200;ch.clearRect(0,0,w,h);ch.fillStyle='#0d1a14';ch.fillRect(0,0,w,h);
+ const T=Math.max(12,H.length/60),X=i=>40+(i/60/T)*(w-50),Y=v=>h-20-(Math.min(70,v)/70)*(h-30);
+ ch.strokeStyle='#2a3a30';ch.fillStyle='#8fa';ch.font='10px sans-serif';ch.textAlign='right';ch.lineWidth=1;
+ for(let v=0;v<=70;v+=10){ch.beginPath();ch.moveTo(40,Y(v));ch.lineTo(w-10,Y(v));ch.stroke();ch.fillText(v,34,Y(v)+3)}
+ ch.textAlign='center';for(let hh=0;hh<=T;hh+=2)ch.fillText(hh+'h',X(hh*60),h-6);
+ ch.setLineDash([5,4]);ch.strokeStyle='#ff6b5e88';ch.beginPath();ch.moveTo(40,Y(P.set));ch.lineTo(w-10,Y(P.set));ch.stroke();ch.setLineDash([]);
+ const ln=(f,cl)=>{ch.strokeStyle=cl;ch.lineWidth=2;ch.beginPath();H.forEach((d,i)=>{const x=X(i),y=Y(f(d));i?ch.lineTo(x,y):ch.moveTo(x,y)});ch.stroke()};
+ ln(d=>d[0],'#ff6b5e');ln(d=>d[1],'#ffb347');ln(d=>d[2],'#5ec8ff')}
+const KP=[['Ta','Air °C'],['Tp','Product °C'],['rh','Chamber RH %'],['mc','Moisture % (wb)'],['q','Airflow m³/h'],['pv','PV W'],['ph','Heater W'],['soc','Battery %'],['mf','PCM melted %'],['sec','kWh per kg water'],['st','Clock'],['state','State']];
+$('kp').innerHTML=KP.map(([i,n])=>`<div><b id="k_${i}">–</b><span>${n}</span></div>`).join('');
+function kpi(){const wat=MD*(X0-s.X),d=mcOf(s)<=DONE;
+ const v={Ta:s.Ta.toFixed(1),Tp:s.Tp.toFixed(1),rh:(s.rh*100).toFixed(0),mc:mcOf(s).toFixed(1),q:(s.Q*3600).toFixed(0),pv:s.Ppv.toFixed(0),ph:s.Ph.toFixed(0),soc:(100*s.soc/BAT).toFixed(0),mf:(s.mf*100).toFixed(0),sec:wat>.02?(s.E/wat).toFixed(2):'–',
+ st:String(Math.floor((s.t/3600)%24)).padStart(2,'0')+':'+String(Math.floor((s.t/60)%60)).padStart(2,'0'),state:d?'Batch done':cut?'Power cut':'Drying'};
+ for(const k in v)$('k_'+k).textContent=v[k]}
+let s,H=[],cut=false,last=0;
+const ctl=()=>{const d=mcOf(s)<=DONE;return{on:!(cut||d),closed:P.ac&&(cut||d)}};
+function reset(){rd();s=init();H=[];cut=false;$('cutb').textContent='⏻ Cut power'}
+$('rs').onclick=reset;$('cutb').onclick=()=>{cut=!cut;$('cutb').textContent=cut?'▶ Resume':'⏻ Cut power'};
+function loop(t){const dt=Math.min(.05,(t-last)/1000);last=t;rd();const n=Math.round(+$('spd').value*dt);
+ for(let i=0;i<n;i++){step(s,P,ctl());if(s.t%60==0)H.push([s.Ta,s.Tp,mcOf(s)])}
+ draw();chart();kpi();requestAnimationFrame(loop)}
+reset();requestAnimationFrame(loop);
+</script></body></html>
