@@ -1,0 +1,431 @@
+{
+  "louver_aerodynamics": {
+    "80_m3_h": {
+      "0deg": {
+        "louver_angle_deg": 0.0,
+        "free_area_ratio": 0.94,
+        "throat_velocity_m_s": 0.79,
+        "louver_pressure_drop_Pa": 0.4,
+        "total_system_head_Pa": 34.7,
+        "fan_electrical_power_W": 5.0,
+        "tray_uniformity_index": 0.55
+      },
+      "15deg": {
+        "louver_angle_deg": 15.0,
+        "free_area_ratio": 0.58,
+        "throat_velocity_m_s": 1.28,
+        "louver_pressure_drop_Pa": 0.5,
+        "total_system_head_Pa": 34.9,
+        "fan_electrical_power_W": 5.0,
+        "tray_uniformity_index": 0.72
+      },
+      "30deg": {
+        "louver_angle_deg": 30.0,
+        "free_area_ratio": 0.248,
+        "throat_velocity_m_s": 2.99,
+        "louver_pressure_drop_Pa": 2.0,
+        "total_system_head_Pa": 36.4,
+        "fan_electrical_power_W": 5.0,
+        "tray_uniformity_index": 0.86
+      },
+      "45deg": {
+        "louver_angle_deg": 45.0,
+        "free_area_ratio": 0.22,
+        "throat_velocity_m_s": 3.37,
+        "louver_pressure_drop_Pa": 2.8,
+        "total_system_head_Pa": 37.1,
+        "fan_electrical_power_W": 5.0,
+        "tray_uniformity_index": 0.81
+      },
+      "60deg": {
+        "louver_angle_deg": 60.0,
+        "free_area_ratio": 0.22,
+        "throat_velocity_m_s": 3.37,
+        "louver_pressure_drop_Pa": 3.0,
+        "total_system_head_Pa": 37.3,
+        "fan_electrical_power_W": 5.0,
+        "tray_uniformity_index": 0.65
+      },
+      "Dynamic_Oscillating_15_45deg": {
+        "mode": "Automated Motorized Sweeping (15\u00b0 - 45\u00b0)",
+        "cycle_period_sec": 20.0,
+        "avg_louver_pressure_drop_Pa": 1.8,
+        "avg_total_system_head_Pa": 36.2,
+        "fan_electrical_power_W": 5.0,
+        "servo_stepper_power_W": 4.8,
+        "total_aerodynamic_actuation_W": 9.8,
+        "tray_uniformity_index": 0.94,
+        "dead_zone_reduction_pct": 89.2,
+        "warping_risk_reduction_pct": 92.0
+      }
+    },
+    "100_m3_h": {
+      "0deg": {
+        "louver_angle_deg": 0.0,
+        "free_area_ratio": 0.94,
+        "throat_velocity_m_s": 0.99,
+        "louver_pressure_drop_Pa": 0.6,
+        "total_system_head_Pa": 45.3,
+        "fan_electrical_power_W": 5.0,
+        "tray_uniformity_index": 0.55
+      },
+      "15deg": {
+        "louver_angle_deg": 15.0,
+        "free_area_ratio": 0.58,
+        "throat_velocity_m_s": 1.6,
+        "louver_pressure_drop_Pa": 0.8,
+        "total_system_head_Pa": 45.6,
+        "fan_electrical_power_W": 5.0,
+        "tray_uniformity_index": 0.72
+      },
+      "30deg": {
+        "louver_angle_deg": 30.0,
+        "free_area_ratio": 0.248,
+        "throat_velocity_m_s": 3.73,
+        "louver_pressure_drop_Pa": 3.2,
+        "total_system_head_Pa": 47.9,
+        "fan_electrical_power_W": 5.0,
+        "tray_uniformity_index": 0.86
+      },
+      "45deg": {
+        "louver_angle_deg": 45.0,
+        "free_area_ratio": 0.22,
+        "throat_velocity_m_s": 4.21,
+        "louver_pressure_drop_Pa": 4.3,
+        "total_system_head_Pa": 49.1,
+        "fan_electrical_power_W": 5.0,
+        "tray_uniformity_index": 0.81
+      },
+      "60deg": {
+        "louver_angle_deg": 60.0,
+        "free_area_ratio": 0.22,
+        "throat_velocity_m_s": 4.21,
+        "louver_pressure_drop_Pa": 4.7,
+        "total_system_head_Pa": 49.4,
+        "fan_electrical_power_W": 5.0,
+        "tray_uniformity_index": 0.65
+      },
+      "Dynamic_Oscillating_15_45deg": {
+        "mode": "Automated Motorized Sweeping (15\u00b0 - 45\u00b0)",
+        "cycle_period_sec": 20.0,
+        "avg_louver_pressure_drop_Pa": 2.9,
+        "avg_total_system_head_Pa": 47.6,
+        "fan_electrical_power_W": 5.0,
+        "servo_stepper_power_W": 4.8,
+        "total_aerodynamic_actuation_W": 9.8,
+        "tray_uniformity_index": 0.94,
+        "dead_zone_reduction_pct": 89.2,
+        "warping_risk_reduction_pct": 92.0
+      }
+    },
+    "120_m3_h": {
+      "0deg": {
+        "louver_angle_deg": 0.0,
+        "free_area_ratio": 0.94,
+        "throat_velocity_m_s": 1.18,
+        "louver_pressure_drop_Pa": 0.8,
+        "total_system_head_Pa": 56.4,
+        "fan_electrical_power_W": 5.0,
+        "tray_uniformity_index": 0.55
+      },
+      "15deg": {
+        "louver_angle_deg": 15.0,
+        "free_area_ratio": 0.58,
+        "throat_velocity_m_s": 1.92,
+        "louver_pressure_drop_Pa": 1.2,
+        "total_system_head_Pa": 56.8,
+        "fan_electrical_power_W": 5.0,
+        "tray_uniformity_index": 0.72
+      },
+      "30deg": {
+        "louver_angle_deg": 30.0,
+        "free_area_ratio": 0.248,
+        "throat_velocity_m_s": 4.48,
+        "louver_pressure_drop_Pa": 4.6,
+        "total_system_head_Pa": 60.1,
+        "fan_electrical_power_W": 5.0,
+        "tray_uniformity_index": 0.86
+      },
+      "45deg": {
+        "louver_angle_deg": 45.0,
+        "free_area_ratio": 0.22,
+        "throat_velocity_m_s": 5.05,
+        "louver_pressure_drop_Pa": 6.2,
+        "total_system_head_Pa": 61.8,
+        "fan_electrical_power_W": 5.0,
+        "tray_uniformity_index": 0.81
+      },
+      "60deg": {
+        "louver_angle_deg": 60.0,
+        "free_area_ratio": 0.22,
+        "throat_velocity_m_s": 5.05,
+        "louver_pressure_drop_Pa": 6.8,
+        "total_system_head_Pa": 62.3,
+        "fan_electrical_power_W": 5.0,
+        "tray_uniformity_index": 0.65
+      },
+      "Dynamic_Oscillating_15_45deg": {
+        "mode": "Automated Motorized Sweeping (15\u00b0 - 45\u00b0)",
+        "cycle_period_sec": 20.0,
+        "avg_louver_pressure_drop_Pa": 4.1,
+        "avg_total_system_head_Pa": 59.7,
+        "fan_electrical_power_W": 5.0,
+        "servo_stepper_power_W": 4.8,
+        "total_aerodynamic_actuation_W": 9.8,
+        "tray_uniformity_index": 0.94,
+        "dead_zone_reduction_pct": 89.2,
+        "warping_risk_reduction_pct": 92.0
+      }
+    },
+    "150_m3_h": {
+      "0deg": {
+        "louver_angle_deg": 0.0,
+        "free_area_ratio": 0.94,
+        "throat_velocity_m_s": 1.48,
+        "louver_pressure_drop_Pa": 1.3,
+        "total_system_head_Pa": 73.9,
+        "fan_electrical_power_W": 5.0,
+        "tray_uniformity_index": 0.55
+      },
+      "15deg": {
+        "louver_angle_deg": 15.0,
+        "free_area_ratio": 0.58,
+        "throat_velocity_m_s": 2.4,
+        "louver_pressure_drop_Pa": 1.9,
+        "total_system_head_Pa": 74.4,
+        "fan_electrical_power_W": 5.0,
+        "tray_uniformity_index": 0.72
+      },
+      "30deg": {
+        "louver_angle_deg": 30.0,
+        "free_area_ratio": 0.248,
+        "throat_velocity_m_s": 5.6,
+        "louver_pressure_drop_Pa": 7.1,
+        "total_system_head_Pa": 79.7,
+        "fan_electrical_power_W": 5.4,
+        "tray_uniformity_index": 0.86
+      },
+      "45deg": {
+        "louver_angle_deg": 45.0,
+        "free_area_ratio": 0.22,
+        "throat_velocity_m_s": 6.31,
+        "louver_pressure_drop_Pa": 9.8,
+        "total_system_head_Pa": 82.3,
+        "fan_electrical_power_W": 5.5,
+        "tray_uniformity_index": 0.81
+      },
+      "60deg": {
+        "louver_angle_deg": 60.0,
+        "free_area_ratio": 0.22,
+        "throat_velocity_m_s": 6.31,
+        "louver_pressure_drop_Pa": 10.5,
+        "total_system_head_Pa": 83.1,
+        "fan_electrical_power_W": 5.6,
+        "tray_uniformity_index": 0.65
+      },
+      "Dynamic_Oscillating_15_45deg": {
+        "mode": "Automated Motorized Sweeping (15\u00b0 - 45\u00b0)",
+        "cycle_period_sec": 20.0,
+        "avg_louver_pressure_drop_Pa": 6.5,
+        "avg_total_system_head_Pa": 79.0,
+        "fan_electrical_power_W": 5.3,
+        "servo_stepper_power_W": 4.8,
+        "total_aerodynamic_actuation_W": 10.1,
+        "tray_uniformity_index": 0.94,
+        "dead_zone_reduction_pct": 89.2,
+        "warping_risk_reduction_pct": 92.0
+      }
+    }
+  },
+  "drying_kinetics": {
+    "nominal_batch_size_kg": 12.5,
+    "dry_solids_kg": 6.25,
+    "initial_water_kg": 6.25,
+    "final_water_kg": 0.852,
+    "total_water_evaporated_kg": 5.398,
+    "cycle_duration_hours": 4.5,
+    "drying_trajectory": [
+      {
+        "time_hours": 0.0,
+        "moisture_ratio_MR": 1.0,
+        "moisture_content_wet_basis_pct": 50.0,
+        "batch_weight_kg": 12.5,
+        "cumulative_water_removed_kg": 0.0,
+        "instantaneous_evap_rate_kg_h": 1.35
+      },
+      {
+        "time_hours": 0.5,
+        "moisture_ratio_MR": 0.7966,
+        "moisture_content_wet_basis_pct": 44.7,
+        "batch_weight_kg": 11.29,
+        "cumulative_water_removed_kg": 1.205,
+        "instantaneous_evap_rate_kg_h": 1.96
+      },
+      {
+        "time_hours": 1.0,
+        "moisture_ratio_MR": 0.6518,
+        "moisture_content_wet_basis_pct": 40.1,
+        "batch_weight_kg": 10.44,
+        "cumulative_water_removed_kg": 2.063,
+        "instantaneous_evap_rate_kg_h": 1.51
+      },
+      {
+        "time_hours": 1.5,
+        "moisture_ratio_MR": 0.5382,
+        "moisture_content_wet_basis_pct": 36.0,
+        "batch_weight_kg": 9.76,
+        "cumulative_water_removed_kg": 2.736,
+        "instantaneous_evap_rate_kg_h": 1.2
+      },
+      {
+        "time_hours": 2.0,
+        "moisture_ratio_MR": 0.4469,
+        "moisture_content_wet_basis_pct": 32.2,
+        "batch_weight_kg": 9.22,
+        "cumulative_water_removed_kg": 3.277,
+        "instantaneous_evap_rate_kg_h": 0.97
+      },
+      {
+        "time_hours": 2.5,
+        "moisture_ratio_MR": 0.3727,
+        "moisture_content_wet_basis_pct": 28.8,
+        "batch_weight_kg": 8.78,
+        "cumulative_water_removed_kg": 3.717,
+        "instantaneous_evap_rate_kg_h": 0.8
+      },
+      {
+        "time_hours": 3.0,
+        "moisture_ratio_MR": 0.3117,
+        "moisture_content_wet_basis_pct": 25.8,
+        "batch_weight_kg": 8.42,
+        "cumulative_water_removed_kg": 4.078,
+        "instantaneous_evap_rate_kg_h": 0.65
+      },
+      {
+        "time_hours": 3.5,
+        "moisture_ratio_MR": 0.2614,
+        "moisture_content_wet_basis_pct": 23.1,
+        "batch_weight_kg": 8.12,
+        "cumulative_water_removed_kg": 4.376,
+        "instantaneous_evap_rate_kg_h": 0.54
+      },
+      {
+        "time_hours": 4.0,
+        "moisture_ratio_MR": 0.2197,
+        "moisture_content_wet_basis_pct": 20.7,
+        "batch_weight_kg": 7.88,
+        "cumulative_water_removed_kg": 4.623,
+        "instantaneous_evap_rate_kg_h": 0.45
+      },
+      {
+        "time_hours": 4.5,
+        "moisture_ratio_MR": 0.185,
+        "moisture_content_wet_basis_pct": 18.5,
+        "batch_weight_kg": 7.67,
+        "cumulative_water_removed_kg": 4.829,
+        "instantaneous_evap_rate_kg_h": 0.37
+      }
+    ]
+  },
+  "power_systems": {
+    "prototype_48v": {
+      "system_tier": "Functional Laboratory / Hackathon Prototype",
+      "power_architecture": "48V DC Native Architecture (Zero Inverter Conversion Loss)",
+      "solar_pv": {
+        "module_type": "Monocrystalline PERC (Single Panel)",
+        "rated_power_W": 400.0,
+        "v_mp_V": 41.5,
+        "i_mp_A": 9.64,
+        "daily_yield_sunny_Wh": 1800.0
+      },
+      "battery_bank": {
+        "chemistry": "LiFePO4 (Lithium Iron Phosphate)",
+        "voltage_nominal_V": 48.0,
+        "capacity_Ah": 50.0,
+        "total_energy_Wh": 2400.0,
+        "depth_of_discharge_pct": 85.0,
+        "usable_energy_Wh": 2040.0,
+        "cycle_life_cycles": 3500
+      },
+      "thermal_system": {
+        "heating_element": "48V Ceramic PTC Air Flow Element (Self-Regulating)",
+        "peak_cold_power_W": 1200.0,
+        "warmup_time_to_50C_min": 18.0,
+        "pwm_steady_state_power_W": 580.0,
+        "chamber_insulation": "40 mm High-Density Glass Wool / Rockwool (k=0.038 W/m.K)"
+      },
+      "aerodynamics_actuation": {
+        "blower_motor": "48V BLDC High-Static Centrifugal Fan (100 m3/h @ 75 Pa)",
+        "blower_power_W": 28.0,
+        "louver_actuator": "MG996R Metal Gear Servo / NEMA 17 Stepper via DC-DC",
+        "actuator_power_W": 5.0,
+        "controller_and_sensors": "ESP32 MCU + SHT31 Temp/RH Sensors + OLED Display",
+        "controller_power_W": 4.5
+      },
+      "cycle_energy_budget_4_5hr": {
+        "warmup_energy_Wh": 360.0,
+        "steady_state_heat_energy_Wh": 2436.0,
+        "fan_energy_Wh": 126.0,
+        "louver_and_mcu_Wh": 42.75,
+        "total_energy_per_batch_Wh": 2965.0,
+        "solar_direct_contribution_Wh": 1350.0,
+        "net_battery_drain_per_batch_Wh": 1615.0,
+        "battery_soc_end_of_batch_pct": 32.7,
+        "feasibility_verdict": "Fully autonomous for 1 complete daytime batch on pure solar+battery. Recharges in afternoon."
+      }
+    },
+    "commercial_hybrid": {
+      "system_tier": "Rural Enterprise / SHG Production Machine",
+      "power_architecture": "Solar-Hybrid Dual-Bus (48V DC Battery + 230V AC Grid Bypass via Smart ATS)",
+      "solar_pv": {
+        "module_type": "2x 450W Bifacial Mono-PERC Array (Series)",
+        "rated_power_W": 900.0,
+        "v_mp_V": 83.0,
+        "i_mp_A": 10.84,
+        "mppt_efficiency_pct": 98.2,
+        "daily_yield_sunny_Wh": 4200.0
+      },
+      "battery_bank": {
+        "chemistry": "LiFePO4 Heavy-Duty Industrial Rack Pack (16S with Smart BMS)",
+        "voltage_nominal_V": 51.2,
+        "capacity_Ah": 100.0,
+        "total_energy_Wh": 5120.0,
+        "depth_of_discharge_pct": 85.0,
+        "usable_energy_Wh": 4352.0,
+        "cycle_life_cycles": 4500
+      },
+      "thermal_system": {
+        "heating_element": "Dual-Stage 2000W PTC Ceramic Matrix (Stage 1: 1000W base, Stage 2: 1000W boost)",
+        "peak_cold_power_W": 2000.0,
+        "warmup_time_to_50C_min": 12.0,
+        "pwm_steady_state_power_W": 880.0,
+        "chamber_insulation": "50 mm Rigid Polyurethane Foam (PUF) Panels (k=0.022 W/m.K)"
+      },
+      "aerodynamics_actuation": {
+        "blower_motor": "48V EC Centrifugal Blower (150 m3/h @ 120 Pa, Speed Regulated)",
+        "blower_power_W": 45.0,
+        "louver_actuator": "Planetary Geared NEMA 17 Stepper with Over-Center Linkage",
+        "actuator_power_W": 7.5,
+        "controller_and_sensors": "Dual-Core ESP32-S3 + Modbus Industrial SHT45 + 4.3\" HMI Touchscreen + 4G IoT",
+        "controller_power_W": 9.0
+      },
+      "smart_grid_bypass_logic": {
+        "mode_1_solar_surplus": "100% loads powered by PV array; excess charges battery bank.",
+        "mode_2_solar_deficit": "PV array + battery discharge dynamically share load without grid penalty.",
+        "mode_3_monsoon_overcast_or_night": "Smart ATS triggers when battery hits 20% SoC -> draws grid power (or generator) seamlessly to complete drying batch.",
+        "zero_production_stoppage": true
+      },
+      "cycle_energy_budget_4_0hr": {
+        "warmup_energy_Wh": 400.0,
+        "steady_state_heat_energy_Wh": 3344.0,
+        "fan_energy_Wh": 180.0,
+        "louver_and_mcu_Wh": 66.0,
+        "total_energy_per_batch_Wh": 3990.0,
+        "solar_direct_contribution_Wh": 2808.0,
+        "net_battery_drain_sunny_Wh": 1182.0,
+        "daily_batches_supported": "2 daytime batches on solar/battery + 1 night batch on grid bypass = 3 batches/day (37.5 to 45 kg/day)",
+        "total_daily_throughput_kg": 40.0
+      }
+    }
+  }
+}

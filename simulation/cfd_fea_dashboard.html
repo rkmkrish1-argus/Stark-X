@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANTIGRAVITY CFD/FEA Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --bg-panel: #1e1e1e;
+            --text-main: #e0e0e0;
+            --text-muted: #9e9e9e;
+            --accent: #ff8c00; /* Amber/Orange */
+            --accent-hover: #ff9800;
+            --green: #4caf50;
+            --red: #f44336;
+            --yellow: #ffeb3b;
+            --border: #333;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: var(--bg-panel);
+            height: 100vh;
+            position: fixed;
+            border-right: 1px solid var(--border);
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            color: var(--accent);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 15px 20px;
+            color: var(--text-main);
+            text-decoration: none;
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255, 140, 0, 0.2);
+            border-left: 4px solid var(--accent);
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+            width: calc(100% - 250px);
+        }
+
+        .section {
+            background: var(--bg-panel);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2.section-title {
+            color: var(--accent);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        select, button {
+            background-color: #333;
+            color: white;
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: var(--accent);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            border-top: 3px solid var(--accent);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* SVG Diagram */
+        #svg-diagram {
+            width: 100%;
+            height: 500px;
+            background: #1a1a1a;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+        }
+
+        .svg-element {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .svg-element:hover {
+            stroke: white;
+            stroke-width: 2px;
+            opacity: 0.9;
+        }
+
+        #element-info {
+            background: #2a2a2a;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+            min-height: 80px;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background-color: #2a2a2a;
+            color: var(--accent);
+        }
+
+        .status-g { color: var(--green); }
+        .status-y { color: var(--yellow); }
+        .status-r { color: var(--red); }
+
+        /* Checklist */
+        .checklist-item {
+            background: #2a2a2a;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .checklist-header {
+            padding: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .checklist-header:hover {
+            background: #333;
+        }
+
+        .checklist-content {
+            padding: 15px;
+            border-top: 1px solid var(--border);
+            display: none;
+            background: #222;
+        }
+
+        @media print {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; width: 100%; }
+            .section { display: block !important; page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>ANTIGRAVITY</h2>
+        <div class="nav-link active" onclick="showSection('sec-3d')">3D Explorer</div>
+        <div class="nav-link" onclick="showSection('sec-velocity')">Airflow Velocity</div>
+        <div class="nav-link" onclick="showSection('sec-temp')">Temperature</div>
+        <div class="nav-link" onclick="showSection('sec-pressure')">Pressure Drop</div>
+        <div class="nav-link" onclick="showSection('sec-transient')">Transient Thermal</div>
+        <div class="nav-link" onclick="showSection('sec-energy')">Energy Balance</div>
+        <div class="nav-link" onclick="showSection('sec-fea')">FEA Structural</div>
+        <div class="nav-link" onclick="showSection('sec-radar')">Design Iterations</div>
+        <div class="nav-link" onclick="showSection('sec-checklist')">SimScale Checklist</div>
+    </div>
+
+    <div class="main-content">
+        <!-- Section 1: 3D Component Explorer -->
+        <div id="sec-3d" class="section active">
+            <h2 class="section-title">Chamber Cross-Section Explorer</h2>
+            <div style="display: flex; gap: 20px;">
+                <div style="flex: 2;">
+                    <svg id="svg-diagram" viewBox="0 0 400 600">
+                        <!-- Outer Shell -->
+                        <rect class="svg-element" data-info="Outer Shell (CRCA), Thickness: 1.2mm, k=43 W/mK" x="50" y="20" width="300" height="560" fill="#333" stroke="#555" />
+                        <!-- Insulation -->
+                        <rect class="svg-element" data-info="Insulation (Rockwool), Thickness: 40mm, k=0.038 W/mK" x="60" y="30" width="280" height="540" fill="#795548" />
+                        <!-- Inner Liner -->
+                        <rect class="svg-element" data-info="Inner Liner (SS304), Thickness: 0.8mm, k=16 W/mK" x="70" y="40" width="260" height="520" fill="#9e9e9e" />
+                        
+                        <!-- Intake & Heater -->
+                        <rect class="svg-element" data-info="Intake Fan, 100 m³/h, 48V DC" x="160" y="40" width="80" height="30" fill="#2196f3" />
+                        <rect class="svg-element" data-info="PTC Heater Matrix, 1.2kW Peak, 580W Steady" x="150" y="75" width="100" height="20" fill="#f44336" />
+                        
+                        <!-- Louver -->
+                        <rect class="svg-element louver" data-info="6-blade Louver, Sweep: 15°-45°" x="100" y="105" width="200" height="15" fill="#ff9800" />
+                        
+                        <!-- Trays (10 tiers) -->
+                        <g id="tray-group"></g>
+                        
+                        <!-- Exhaust -->
+                        <rect class="svg-element" data-info="Exhaust Chimney, Damper controlled" x="175" y="540" width="50" height="20" fill="#607d8b" />
+                    </svg>
+                </div>
+                <div style="flex: 1;">
+                    <div id="element-info">
+                        <h3>Component Details</h3>
+                        <p>Click on any component in the diagram to view its properties.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Airflow Velocity -->
+        <div id="sec-velocity" class="section">
+            <h2 class="section-title">Airflow Velocity Profile</h2>
+            <div class="controls">
+                <label>Louver Angle:</label>
+                <select id="vel-louver" onchange="updateVelocityChart()">
+                    <option value="0">0°</option>
+                    <option value="15">15°</option>
+                    <option value="30">30°</option>
+                    <option value="45">45°</option>
+                    <option value="dynamic" selected>Dynamic (Sweep)</option>
+                </select>
+                <label>Flow Rate:</label>
+                <select id="vel-flow" onchange="updateVelocityChart()">
+                    <option value="80">80 m³/h</option>
+                    <option value="100" selected>100 m³/h</option>
+                    <option value="120">120 m³/h</option>
+                    <option value="150">150 m³/h</option>
+                </select>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-box">Uniformity Index (γ) <br><span class="stat-value" id="vel-uniformity">0.92</span></div>
+                <div class="stat-box">Mean Velocity <br><span class="stat-value" id="vel-mean">0.85 m/s</span></div>
+            </div>
+            <div class="chart-container">
+                <canvas id="velocityChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Section 3: Temperature -->
+        <div id="sec-temp" class="section">
+            <h2 class="section-title">Temperature Distribution</h2>
+            <div class="stats-grid">
+                <div class="stat-box">Max Spread (ΔT_max) <br><span class="stat-value">3.2 °C</span></div>
+                <div class="stat-box">Mean Temp <br><span class="stat-value">50.1 °C</span></div>
+            </div>
+            <div class="chart-container">
+                <canvas id="tempChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Section 4: Pressure Drop -->
+        <div id="sec-pressure" class="section">
+            <h2 class="section-title">Pressure Drop Breakdown</h2>
+            <div class="stats-grid">
+                <div class="stat-box">Total System Head <br><span class="stat-value">62 Pa</span></div>
+                <div class="stat-box">Fan Operating Point <br><span class="stat-value">62 Pa @ 100 m³/h</span></div>
+            </div>
+            <div class="chart-container">
+                <canvas id="pressureChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Section 5: Transient Thermal -->
+        <div id="sec-transient" class="section">
+            <h2 class="section-title">Transient Thermal Analysis</h2>
+            <div class="controls">
+                <label>Configuration:</label>
+                <select id="trans-config" onchange="updateTransientChart()">
+                    <option value="1">40mm Rockwool (Baseline)</option>
+                    <option value="2">50mm PUF</option>
+                    <option value="3">40mm Rockwool + 3kg PCM RT52</option>
+                    <option value="4" selected>50mm PUF + 5kg PCM</option>
+                </select>
+                <button onclick="toggleAnimation()">Play/Pause</button>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-box">Time Constant (τ) <br><span class="stat-value" id="trans-tau">45 min</span></div>
+                <div class="stat-box">Time > 45°C (Heater Off) <br><span class="stat-value" id="trans-time">120 min</span></div>
+            </div>
+            <div class="chart-container">
+                <canvas id="transientChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Section 6: Energy Balance -->
+        <div id="sec-energy" class="section">
+            <h2 class="section-title">Energy Balance</h2>
+            <div class="chart-container" style="height: 400px; display: flex; justify-content: center;">
+                <canvas id="energyChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Section 7: FEA Structural -->
+        <div id="sec-fea" class="section">
+            <h2 class="section-title">FEA Structural Summary</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Tray Deflection (mm)</th>
+                        <th>Thermal Stress (MPa)</th>
+                        <th>Safety Factor</th>
+                        <th>Thermal Expansion (mm)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Outer Shell (CRCA)</td>
+                        <td>-</td>
+                        <td>12.5 (Yield: 240)</td>
+                        <td class="status-g">19.2 (Safe)</td>
+                        <td>0.8</td>
+                    </tr>
+                    <tr>
+                        <td>Inner Liner (SS304)</td>
+                        <td>-</td>
+                        <td>45.2 (Yield: 215)</td>
+                        <td class="status-g">4.7 (Safe)</td>
+                        <td>1.2</td>
+                    </tr>
+                    <tr>
+                        <td>Tray Stack (Full Load)</td>
+                        <td>1.2 (Allow: 3.0)</td>
+                        <td>32.1 (Yield: 215)</td>
+                        <td class="status-y">6.6 (Acceptable)</td>
+                        <td>0.5</td>
+                    </tr>
+                    <tr>
+                        <td>Heater Mount Bracket</td>
+                        <td>0.1</td>
+                        <td>145.0 (Yield: 215)</td>
+                        <td class="status-r">1.4 (Marginal)</td>
+                        <td>0.3</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Section 8: Design Iterations -->
+        <div id="sec-radar" class="section">
+            <h2 class="section-title">Design Iteration Tracker</h2>
+            <div style="display: flex; gap: 20px;">
+                <div style="flex: 1; height: 400px;">
+                    <canvas id="radarChart"></canvas>
+                </div>
+                <div style="flex: 1;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Version</th>
+                                <th>Key Change</th>
+                                <th>Recommendation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>v0</td><td>Baseline (No louvers)</td><td>Rejected</td></tr>
+                            <tr><td>v1</td><td>Added static 30° louver</td><td>Poor uniformity</td></tr>
+                            <tr><td>v2</td><td>Dynamic sweep louver (15-45°)</td><td>Good, but high heat loss</td></tr>
+                            <tr><td style="color:var(--accent);font-weight:bold">v3</td><td style="color:var(--accent)">v2 + 50mm PUF + PCM</td><td style="color:var(--accent);font-weight:bold">SELECTED</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 9: SimScale Checklist -->
+        <div id="sec-checklist" class="section">
+            <h2 class="section-title">SimScale Setup Checklist</h2>
+            
+            <div class="checklist-item">
+                <div class="checklist-header" onclick="toggleChecklist(this)">
+                    <input type="checkbox" checked onclick="event.stopPropagation()">
+                    <span style="margin-left: 10px; font-weight: bold;">1. CAD Preparation</span>
+                </div>
+                <div class="checklist-content">
+                    Extract internal flow volume. Remove fillets < 2mm. Simplify tray mesh to porous media equivalent blocks (saves mesh elements).
+                </div>
+            </div>
+
+            <div class="checklist-item">
+                <div class="checklist-header" onclick="toggleChecklist(this)">
+                    <input type="checkbox" checked onclick="event.stopPropagation()">
+                    <span style="margin-left: 10px; font-weight: bold;">2. Material Assignment</span>
+                </div>
+                <div class="checklist-content">
+                    Air: Incompressible, Boussinesq approx for buoyancy. Solid: SS304 (k=16), CRCA (k=43), PUF (k=0.022). PCM modeled as solid with specific heat curve.
+                </div>
+            </div>
+
+            <div class="checklist-item">
+                <div class="checklist-header" onclick="toggleChecklist(this)">
+                    <input type="checkbox" onclick="event.stopPropagation()">
+                    <span style="margin-left: 10px; font-weight: bold;">3. Mesh Setup</span>
+                </div>
+                <div class="checklist-content">
+                    Hex-dominant parametric. Refinement regions: Louver wake zone (level 3), Heater vicinity (level 4), Boundary layers: 5 layers, expansion ratio 1.2.
+                </div>
+            </div>
+
+            <div class="checklist-item">
+                <div class="checklist-header" onclick="toggleChecklist(this)">
+                    <input type="checkbox" onclick="event.stopPropagation()">
+                    <span style="margin-left: 10px; font-weight: bold;">4. Boundary Conditions</span>
+                </div>
+                <div class="checklist-content">
+                    Inlet: Volumetric flow 100 m³/h. Outlet: Pressure outlet (0 Pa). Heater: Volumetric heat source (580W). Walls: Convection heat transfer coeff (h=5 W/m²K, T_ext=25°C).
+                </div>
+            </div>
+
+            <div class="checklist-item">
+                <div class="checklist-header" onclick="toggleChecklist(this)">
+                    <input type="checkbox" onclick="event.stopPropagation()">
+                    <span style="margin-left: 10px; font-weight: bold;">5. Solver Settings & Post-Processing</span>
+                </div>
+                <div class="checklist-content">
+                    k-omega SST turbulence model. Transient simulation: 0.1s timestep for louver sweep, pseudo-transient for thermal warmup. Setup probe points at all 10 tray centers.
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Navigation Logic
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(id).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // SVG Interactivity
+        const trayGroup = document.getElementById('tray-group');
+        let trayY = 140;
+        for(let i=1; i<=10; i++) {
+            trayGroup.innerHTML += `<rect class="svg-element" data-info="Tray Level ${i}, Temp: ${52 - i*0.4}°C, Vel: 1.1 m/s" x="90" y="${trayY}" width="220" height="10" fill="rgba(255, 140, 0, ${1 - i*0.05})" stroke="#333" />`;
+            trayY += 38; // 55mm pitch scaled
+        }
+
+        document.querySelectorAll('.svg-element').forEach(el => {
+            el.addEventListener('click', (e) => {
+                document.getElementById('element-info').innerHTML = `<h3>Component Details</h3><p>${e.target.getAttribute('data-info')}</p>`;
+            });
+        });
+
+        // Chart defaults
+        Chart.defaults.color = '#e0e0e0';
+        Chart.defaults.font.family = "'Segoe UI', sans-serif";
+
+        // 2. Velocity Chart
+        const ctxVel = document.getElementById('velocityChart').getContext('2d');
+        const velChart = new Chart(ctxVel, {
+            type: 'bar',
+            data: {
+                labels: ['T1 (Top)', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10 (Bot)'],
+                datasets: [{
+                    label: 'Velocity (m/s)',
+                    data: [1.2, 1.1, 1.15, 1.0, 0.95, 0.9, 0.85, 0.75, 0.7, 0.6],
+                    backgroundColor: 'rgba(76, 175, 80, 0.7)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 2.0,
+                        title: { display: true, text: 'Velocity (m/s)' }
+                    }
+                },
+                plugins: {
+                    annotation: {
+                        annotations: {
+                            box1: {
+                                type: 'box',
+                                yMin: 0.5,
+                                yMax: 1.5,
+                                backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                                borderWidth: 0
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        function updateVelocityChart() {
+            // Dummy update logic
+            const isDynamic = document.getElementById('vel-louver').value === 'dynamic';
+            const flow = document.getElementById('vel-flow').value;
+            const mult = flow / 100;
+            
+            let base = isDynamic ? [1.1, 1.05, 1.0, 0.95, 0.9, 0.85, 0.85, 0.8, 0.8, 0.75] : [1.4, 1.2, 0.9, 0.7, 0.5, 0.4, 0.3, 0.3, 0.2, 0.2];
+            
+            velChart.data.datasets[0].data = base.map(v => v * mult);
+            velChart.update();
+            
+            document.getElementById('vel-uniformity').innerText = isDynamic ? '0.92' : '0.45';
+            document.getElementById('vel-mean').innerText = (0.85 * mult).toFixed(2) + ' m/s';
+        }
+
+        // 3. Temp Chart
+        const ctxTemp = document.getElementById('tempChart').getContext('2d');
+        new Chart(ctxTemp, {
+            type: 'line',
+            data: {
+                labels: ['Inlet', 'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10', 'Exhaust'],
+                datasets: [{
+                    label: 'Temperature (°C)',
+                    data: [54.0, 51.5, 51.2, 50.8, 50.5, 50.1, 49.8, 49.5, 49.0, 48.6, 48.3, 47.5],
+                    borderColor: '#ff8c00',
+                    backgroundColor: 'rgba(255, 140, 0, 0.2)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        min: 40,
+                        max: 60,
+                        title: { display: true, text: 'Temperature (°C)' }
+                    }
+                }
+            }
+        });
+
+        // 4. Pressure Chart
+        const ctxPress = document.getElementById('pressureChart').getContext('2d');
+        new Chart(ctxPress, {
+            type: 'bar',
+            data: {
+                labels: ['System Components'],
+                datasets: [
+                    { label: 'Intake Mesh', data: [12], backgroundColor: '#8884d8' },
+                    { label: 'PTC Heater', data: [15], backgroundColor: '#82ca9d' },
+                    { label: 'Louver Bank', data: [5], backgroundColor: '#ffc658' },
+                    { label: 'Tray Stack', data: [22], backgroundColor: '#ff8042' },
+                    { label: 'Exhaust Damper', data: [8], backgroundColor: '#a4de6c' }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { stacked: true },
+                    y: { stacked: true, title: { display: true, text: 'Pressure Drop (Pa)' } }
+                }
+            }
+        });
+
+        // 5. Transient Chart
+        const ctxTrans = document.getElementById('transientChart').getContext('2d');
+        const transChart = new Chart(ctxTrans, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 30}, (_, i) => i * 15), // 0 to 435 mins
+                datasets: [{
+                    label: 'Average Chamber Temp (°C)',
+                    data: [25, 38, 48, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 48, 45, 42, 39, 36, 33, 31, 29, 28, 27, 26, 25, 25, 25, 25],
+                    borderColor: '#ff8c00',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { title: { display: true, text: 'Time (min)' } },
+                    y: { title: { display: true, text: 'Temperature (°C)' }, min: 20, max: 60 }
+                }
+            }
+        });
+
+        let animationFrame;
+        let animatedData = [];
+        
+        function updateTransientChart() {
+            const config = document.getElementById('trans-config').value;
+            let data = [];
+            if(config == 1) { // Rockwool
+                data = [25, 45, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 42, 35, 30, 27, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25];
+                document.getElementById('trans-tau').innerText = '25 min';
+                document.getElementById('trans-time').innerText = '15 min';
+            } else if (config == 4) { // PUF + PCM
+                data = [25, 35, 45, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 49, 48, 47, 46, 45, 40, 35, 32, 29, 27, 26, 25, 25, 25, 25];
+                document.getElementById('trans-tau').innerText = '85 min';
+                document.getElementById('trans-time').innerText = '75 min';
+            }
+            transChart.data.datasets[0].data = data;
+            transChart.update();
+        }
+
+        function toggleAnimation() {
+            // Simple visual indicator for animation
+            transChart.data.datasets[0].borderColor = transChart.data.datasets[0].borderColor === '#ff8c00' ? '#4caf50' : '#ff8c00';
+            transChart.update();
+        }
+
+        // 6. Energy Chart
+        const ctxEnergy = document.getElementById('energyChart').getContext('2d');
+        new Chart(ctxEnergy, {
+            type: 'doughnut',
+            data: {
+                labels: ['Moisture Evaporation (Useful)', 'Wall Conduction Losses', 'Exhaust Sensible Heat', 'Fan Power', 'Electronics'],
+                datasets: [{
+                    data: [72.5, 12.0, 10.5, 4.0, 1.0],
+                    backgroundColor: ['#4caf50', '#f44336', '#ff9800', '#2196f3', '#9e9e9e'],
+                    borderWidth: 1,
+                    borderColor: '#121212'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) { label += ': '; }
+                                label += context.parsed + '% (~' + (context.parsed * 60).toFixed(0) + ' Wh/cycle)';
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // 8. Radar Chart
+        const ctxRadar = document.getElementById('radarChart').getContext('2d');
+        new Chart(ctxRadar, {
+            type: 'radar',
+            data: {
+                labels: ['Temp Uniformity', 'Low Pressure Drop', 'Thermal Mass (τ)', 'Energy Efficiency', 'Cost Effectiveness'],
+                datasets: [
+                    {
+                        label: 'v0 (Baseline)',
+                        data: [2, 9, 3, 4, 10],
+                        borderColor: '#9e9e9e',
+                        backgroundColor: 'rgba(158, 158, 158, 0.2)'
+                    },
+                    {
+                        label: 'v3 (PUF+PCM+Dynamic)',
+                        data: [9, 6, 10, 9, 6],
+                        borderColor: '#ff8c00',
+                        backgroundColor: 'rgba(255, 140, 0, 0.4)'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: { color: '#444' },
+                        grid: { color: '#444' },
+                        pointLabels: { color: '#e0e0e0' },
+                        ticks: { display: false, min: 0, max: 10 }
+                    }
+                }
+            }
+        });
+
+        // Checklist toggle
+        function toggleChecklist(el) {
+            const content = el.nextElementSibling;
+            content.style.display = content.style.display === 'block' ? 'none' : 'block';
+        }
+
+    </script>
+</body>
+</html>
